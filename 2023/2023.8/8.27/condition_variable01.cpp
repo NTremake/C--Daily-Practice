@@ -15,14 +15,13 @@ private:
 	condition_variable m_cond;// 条件变量，不能拷贝和赋值
 	queue<string, deque<string>> m_que;// 缓存队列，底层容器用deque(第二个参数是指定底层容器类型)
 public:
-	void incache(int mun)
+	void incache(int num)
 	{
 		lock_guard<mutex> lock(m_mtx);// 申请加锁
-		for (int i = 0; i < mun; i++)
+		for (int i = 0; i < num; i++)
 		{
 			string str = "数据" + to_string(i + 1);
 			m_que.push(str);
-			//cout << "生产了数据：" << str << endl;
 		}
 		//m_cond.notify_one();// 唤醒一个被当前条件变量阻塞的线程
 		m_cond.notify_all();// 唤醒所有线程，生产多个数据时，这个效率更高;但是数据不够的时候，线程可能被虚假唤醒
@@ -57,7 +56,7 @@ int main()
 	thread t3(&AA::outcache, &aa);
 
 	this_thread::sleep_for(chrono::seconds(1));
-	aa.incache(2);// 生产3个数据
+	aa.incache(2);// 生产2个数据
 	this_thread::sleep_for(chrono::seconds(2));
 	aa.incache(5);// 生产5个数据
 
